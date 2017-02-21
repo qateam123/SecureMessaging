@@ -2,7 +2,7 @@ import unittest
 import os
 import sys
 #from app.views import views
-from app import *
+from app.views import views
 #from .app import app
 
 from flask import request
