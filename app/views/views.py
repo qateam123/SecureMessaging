@@ -2,14 +2,13 @@ from app import app
 from flask import request, redirect
 from flask import render_template, jsonify
 
-
 @app.route('/')
 @app.route('/index')
 def index():
     return "Hello, World!"
 
 @app.route('/dev', methods=['GET', 'POST'])
-def devMode():
+def dev_mode():
     if request.method == 'POST':
         user = request.form
         username = user.get("username")
@@ -20,6 +19,6 @@ def devMode():
 def validate():
     username = request.args.get('username')
     if not username:
-        return jsonify(usernameValid = False)
+        return jsonify(usernameValid=False)
     else:
-        return jsonify(usernameValid = True)
+        return jsonify(usernameValid=True)
