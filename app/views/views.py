@@ -8,18 +8,18 @@ from flask import render_template, jsonify
 def index():
     return "Hello, World!"
 
-@app.route('/dev', methods=['GET', 'POST'])
+@app.route('/message', methods=['GET', 'POST'])
 def devMode():
     if request.method == 'POST':
         user = request.form
-        username = user.get("username")
-        return redirect("/validate?username=" + username)
-    return render_template("dev.html")
+        message = user.get("msg")
+        return redirect("/validate?msg=" + message)
+    return render_template("message.html")
 
 @app.route('/validate', methods=['GET'])
 def validate():
-    username = request.args.get('username')
-    if not username:
-        return jsonify(usernameValid = False)
+    message = request.args.get('msg')
+    if not message:
+        return jsonify(msgValid = False, msg = "empty")
     else:
-        return jsonify(usernameValid = True)
+        return jsonify(msgValid = True, msg = message)
