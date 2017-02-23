@@ -1,7 +1,6 @@
 from app import app
 from flask import request, redirect
 from flask import render_template, jsonify
-import sys
 
 
 @app.route('/')
@@ -21,9 +20,6 @@ def devMode():
 def validate():
     username = request.args.get('username')
     if not username:
-        print ("No username", file=sys.stderr)
         return jsonify(usernameValid = False)
     else:
-        print (username, file=sys.stderr)
-        print ("fun", file=sys.stderr)
         return jsonify(usernameValid = True)
