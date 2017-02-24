@@ -4,31 +4,16 @@ dist: trusty
 python: '3.4'
 
 # before_install:
-#     # install Chromedriver
-#     - export CHROME_BIN=/usr/bin/google-chrome
-#     - export DISPLAY=:99.0
-#     - sh -e /etc/init.d/xvfb start
-#     - wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
-#     - sudo dpkg -i google-chrome*.deb
-#
-#     - sudo apt-key adv --fetch-keys http://dl.yarnpkg.com/debian/pubkey.gpg
-#     - echo "deb http://dl.yarnpkg.com/debian/ stable main" | sudo tee /etc/apt/sources.list.d/yarn.list
-#     - sudo apt-get update -qq
-#     - sudo apt-get install -q libappindicator1 fonts-liberation yarn
-#
-#     # Repo for newer Node.js versions
-#     - curl -sL https://deb.nodesource.com/setup_6.x | sudo -E bash -
+
 cache:
     - pip
 install:
-    # - . $HOME/.nvm/nvm.sh
-    # - nvm install v6.9.1
-    # - pip install -U pip wheel
     - pip install -r requirements.txt
 
 script:
     - python tests/my_tests.py
-after_success:
+
+# after_success:
 
 branches:
     only:
