@@ -1,4 +1,4 @@
-# SecureMessaging
+# secure-messaging-ui
 [![Build Status](https://travis-ci.org/qateam123/secure-messaging-ui.svg?branch=master)](https://travis-ci.org/qateam123/secure-messaging-ui)
 
 ## Setup
