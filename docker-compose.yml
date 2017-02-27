@@ -1,0 +1,17 @@
+version: '2'
+
+services:
+
+  secure-messaging-ui:
+    build: ./
+    restart: always
+    volumes:
+      - ./app:/code/app
+    networks:
+      - ui-env
+    ports:
+      - "5000:5000"
+
+networks:
+  ui-env:
+    driver: bridge
