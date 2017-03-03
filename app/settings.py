@@ -1,0 +1,1 @@
+SECURE_MESSAGING_API_URL = "http://172.28.93.106:5050/message"
