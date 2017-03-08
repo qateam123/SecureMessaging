@@ -39,6 +39,8 @@ pip install -r requirements.txt
 ## Test
 Behaviour Driven Tests using Behave
 
+API must be running on localhost.
+
 Access behaviour test folder
 
 ```
