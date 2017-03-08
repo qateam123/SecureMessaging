@@ -3,6 +3,7 @@ from flask import request, redirect, json
 from flask import render_template, jsonify
 import requests
 from app import settings
+import sys
 
 
 @app.route('/')
@@ -11,18 +12,19 @@ def index():
     return "Hello, World!"
 
 
-@app.route('/message', methods=['GET', 'POST'])
+@app.route('/newmessage', methods=['GET', 'POST'])
 def dev_mode():
     if request.method == 'POST':
         user = request.form
         url = settings.SECURE_MESSAGING_API_URL
         data = {'to': user.get("to"), 'from': user.get("from"), 'body': user.get("msg")}
         headers = {'Content-Type': 'application/json'}
-
+        print(data, file=sys.stderr)
         r = requests.post(url, data=json.dumps(data), headers=headers)
+        print(r.text, file=sys.stderr)
         return r.text
         #return redirect("/validate?msg=" + message)
-    return render_template("message.html")
+    return render_template("new-message.html")
 
 
 @app.route('/validate', methods=['GET'])
