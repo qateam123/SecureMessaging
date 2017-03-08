@@ -35,3 +35,18 @@ Install dependencies using pip
 ```
 pip install -r requirements.txt
 ```
+
+## Test
+Behaviour Driven Tests using Behave
+
+Access behaviour test folder
+
+```
+cd tests/behave-BDD-tests/features
+```
+
+Run Test
+
+```
+behave newmessage.feature
+```
