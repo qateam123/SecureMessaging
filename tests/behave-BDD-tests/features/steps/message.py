@@ -23,5 +23,5 @@ def step_impl(context):
     try:
         driver.find_element_by_id("bubbles")
         pass
-    except NoSuchElementException:
+    except:
         return False
