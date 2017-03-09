@@ -1,1 +1,3 @@
-SECURE_MESSAGING_API_URL = "http://172.28.93.106:5050/message"
+import os
+
+SECURE_MESSAGING_API_URL = os.getenv('SECURE_MESSAGING_API_URL', "http://localhost:5050/message")
