@@ -12,7 +12,7 @@ def index():
     return "Hello, World!"
 
 
-@app.route('/newmessage', methods=['GET', 'POST'])
+@app.route('/new-message', methods=['GET', 'POST'])
 def dev_mode():
     if request.method == 'POST':
         user = request.form
@@ -22,7 +22,7 @@ def dev_mode():
         print(data, file=sys.stderr)
         r = requests.post(url, data=json.dumps(data), headers=headers)
         print(r.text, file=sys.stderr)
-        return r.text
+        return render_template("sent-message.html")
         #return redirect("/validate?msg=" + message)
     return render_template("new-message.html")
 
