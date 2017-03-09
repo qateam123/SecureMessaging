@@ -1,0 +1,27 @@
+from app import app
+
+@app.route('/')
+@app.route('/new-message.html')
+def index():
+
+<html>
+<head>
+    <title>Messaging</title>
+</head>
+
+<body>
+      <form action="" method="POST" name='msg'>
+       { form.hidden_tag()} }
+       <p>
+        From: {{form.from_input(size=10)}}  </br>
+        To: {{form.to_input(size=10)}} </br>
+        Message: {{form.message_input(size=80)}}
+}
+
+      </p>
+          <!-- Start: @button--button -->
+          <button class="btn ">Submit</button>
+      </form>
+</body>
+
+</html>

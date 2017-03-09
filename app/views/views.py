@@ -4,6 +4,7 @@ from flask import render_template, jsonify
 import requests
 from app import settings
 import sys
+from app.forms import MessageForm
 
 
 @app.route('/')
@@ -14,6 +15,7 @@ def index():
 
 @app.route('/new-message', methods=['GET', 'POST'])
 def dev_mode():
+    form = MessageForm()
     if request.method == 'POST':
         user = request.form
         url = settings.SECURE_MESSAGING_API_URL
@@ -22,10 +24,10 @@ def dev_mode():
         print(data, file=sys.stderr)
         r = requests.post(url, data=json.dumps(data), headers=headers)
         print(r.text, file=sys.stderr)
-        return render_template("sent-message.html")
+        return render_template("secure-messaging/sent-message.html")
         #return redirect("/validate?msg=" + message)
-    return render_template("new-message.html")
-
+    return render_template("secure-messaging/new-message.html",
+                          form=form)
 
 @app.route('/validate', methods=['GET'])
 def validate():
