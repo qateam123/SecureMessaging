@@ -20,8 +20,5 @@ def step_impl(context):
 
 @then("Successful response from API")
 def step_impl(context):
-    try:
-        driver.find_element_by_id("bubbles")
-        pass
-    except:
-        return False
+    driver.find_element_by_id("bubbles")
+    pass
