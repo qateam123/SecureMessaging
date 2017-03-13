@@ -15,19 +15,31 @@ def index():
 
 @app.route('/new-message', methods=['GET', 'POST'])
 def dev_mode():
-    form = MessageForm()
-    if request.method == 'POST':
-        user = request.form
+    form = MessageForm(request.form)
+
+    if request.method == 'POST' and form.validate():
+        to_input = request.form['to_input']
+        from_input = request.form['from_input']
+        message_input = request.form['message_input']
         url = settings.SECURE_MESSAGING_API_URL
-        data = {'to': user.get("to"), 'from': user.get("from"), 'body': user.get("msg")}
+        data = {'to': request.form['to_input'], 'from': request.form['from_input'], 'body': request.form['message_input']}
         headers = {'Content-Type': 'application/json'}
-        print(data, file=sys.stderr)
         r = requests.post(url, data=json.dumps(data), headers=headers)
-        print(r.text, file=sys.stderr)
-        return render_template("secure-messaging/sent-message.html")
+        print (to_input, from_input, message_input, file=sys.stderr)
+        #if to_input == "":
+
+    return render_template('secure-messaging/new-message.html', form=form)
+        # user = request.form
+        # url = settings.SECURE_MESSAGING_API_URL
+        # data = {'to': user.get("to"), 'from': user.get("from"), 'body': user.get("msg")}
+        # headers = {'Content-Type': 'application/json'}
+        # print(data, file=sys.stderr)
+        # r = requests.post(url, data=json.dumps(data), headers=headers)
+        # print(r.text, file=sys.stderr)
+        # return render_template("secure-messaging/sent-message.html")
         #return redirect("/validate?msg=" + message)
-    return render_template("secure-messaging/new-message.html",
-                          form=form)
+    # return render_template("secure-messaging/new-message.html",
+    #                       form=form)
 
 @app.route('/validate', methods=['GET'])
 def validate():

@@ -1,27 +1,27 @@
-from app import app
-
-@app.route('/')
-@app.route('/new-message.html')
-def index():
-
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html>
-<head>
-    <title>Messaging</title>
-</head>
+    <head>
+        <title>New Message</title>
+    </head>
+    <body>
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                <ul>
+                    {% for message in messages %}
+                        <li>{{ message[1] }}</li>
+                    {% endfor %}
+                </ul>
+            {% endif %}
+        {% endwith %}
 
-<body>
-      <form action="" method="POST" name='msg'>
-       { form.hidden_tag()} }
-       <p>
-        From: {{form.from_input(size=10)}}  </br>
-        To: {{form.to_input(size=10)}} </br>
-        Message: {{form.message_input(size=80)}}
-}
-
-      </p>
-          <!-- Start: @button--button -->
-          <button class="btn ">Submit</button>
-      </form>
-</body>
-
+    {% from "secure-messaging/_formhelpers.html" import render_field %}
+    <form method=post>
+      <dl>
+        {{ render_field(form.to_input) }}
+        {{ render_field(form.from_input) }}
+        {{ render_field(form.message_input) }}
+      </dl>
+      <p><input id=submit type=submit value=Send>
+    </form>
+    </body>
 </html>
