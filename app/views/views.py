@@ -50,17 +50,12 @@ def dev_mode():
 
     if request.method == 'POST' and form.validate():
 
-        to_input = request.form['to_input']
-        message_input = request.form['message_input']
-        url = settings.SECURE_MESSAGING_API_URL + settings.SM_SEND_MESSAGE_URL
-        data = {'urn_to': request.form['to_input'], 'urn_from': token_data['user_urn'], 'subject': request.form['subject_input'],
-                'body': request.form['message_input'], 'thread_id': '', 'collection_case': 'testCC', 'reporting_unit': 'testRU', 'survey': 'testSurvey'}
+        url = settings.SECURE_MESSAGING_API_URL
+        if request.form['submit'] == 'Send Message':
+            return send_message(request.form, url)
+        elif request.form['submit'] == 'Save as Draft':
+            return save_draft(request.form, url)
 
-        response = requests.post(url, data=json.dumps(data), headers=headers)
-        resp_data = json.loads(response.text)
-        print(to_input, message_input, file=sys.stderr)
-        logger.info(response.status_code, resp_data['msg_id'])
-        return render_template("secure-messaging/sent-message.html", code=201)
     return render_template('secure-messaging/new-message.html', form=form)
 
 
@@ -106,3 +101,20 @@ def validate():
     else:
         return jsonify(msgValid=True, msg=message)
 
+
+def send_message(form, url):
+    data = {'urn_to': form['to_input'], 'urn_from': token_data['user_urn'], 'subject': form['subject_input'],
+            'body': form['message_input'], 'thread_id': '', 'collection_case': 'testCC', 'reporting_unit': 'testRU', 'survey': 'testSurvey'}
+    response = requests.post(url+settings.SM_SEND_MESSAGE_URL, data=json.dumps(data), headers=headers)
+    resp_data = json.loads(response.text)
+    logger.info(response.status_code, resp_data['msg_id'])
+    return render_template("secure-messaging/sent-message.html", code=201)
+
+
+def save_draft(form, url):
+    data = {'urn_to': form['to_input'], 'urn_from': token_data['user_urn'], 'subject': form['subject_input'],
+            'body': form['message_input'], 'thread_id': '', 'collection_case': 'testCC', 'reporting_unit': 'testRU', 'survey': 'testSurvey'}
+    response = requests.post(url + settings.SM_SAVE_DRAFT_URL, data=json.dumps(data), headers=headers)
+    resp_data = json.loads(response.text)
+    logger.info(response.status_code, resp_data['msg_id'])
+    return render_template("secure-messaging/save-draft.html", code=201)

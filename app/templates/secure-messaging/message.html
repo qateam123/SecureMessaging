@@ -5,16 +5,19 @@
         <title>Show Message</title>
     </head>
     <body>
-    <ul class="message">
-        <li> Message ID: {{ message['msg_id'] }}</li>
-        <li> To: {{ message['urn_to'] }}</li>
-        <li> From: {{ message['urn_from'] }}</li>
-        <li> Subject: {{ message['subject'] }}</li>
-        <li> Body: {{ message['body'] }}</li>
-        <li> Thread ID: {{ message['thread_id'] }}</li>
-        <li> Collection Case: {{ message['collection_case'] }}</li>
-        <li> Reporting Unit: {{ message['reporting_unit'] }}</li>
-        <li> Survey: {{ message['survey']}}</li>
-    </ul>
+        <ul class="message">
+            <li> Message ID: {{ message['msg_id'] }}</li>
+            <li> To: {{ message['urn_to'] }}</li>
+            <li> From: {{ message['urn_from'] }}</li>
+            <li> Subject: {{ message['subject'] }}</li>
+            <li> Body: {{ message['body'] }}</li>
+            <li> Thread ID: {{ message['thread_id'] }}</li>
+            <li> Collection Case: {{ message['collection_case'] }}</li>
+            <li> Reporting Unit: {{ message['reporting_unit'] }}</li>
+            <li> Survey: {{ message['survey']}}</li>
+        </ul>
+    <form action="http://localhost:5000/messages">
+        <input type="submit" value="Back to Messages">
+    </form>
     </body>
 </html>
