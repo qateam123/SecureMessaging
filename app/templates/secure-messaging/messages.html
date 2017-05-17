@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <title>All Messages</title>
+    </head>
+    <body>
+    {% block body %}
+        <h1>List of Messages</h1>
+
+    <table style="width:100%; text-align: center;">
+        <tr>
+            <th>Message ID</th>
+            <th>From</th>
+            <th>Subject</th>
+            <th>Body</th>
+            <th>Date</th>
+        </tr>
+        {% for message in messages %}
+        <tr>
+            <td><a href="{{ 'http://localhost:5000/message/%s'%messages[message]['msg_id']}}">{{ messages[message]['msg_id'] }}</a></td>
+            <td>{{ messages[message]['urn_from'] }}</td>
+            <td>{{ messages[message]['subject'] }}</td>
+            <td>{{ messages[message]['body']|truncate(10) }}</td>
+            <td>{{ messages[message]['sent_date'] }}</td>
+            <td>{% if 'UNREAD' in messages[message]['labels'] %}
+                     <a href="{{ 'http://localhost:5000/message/%s/edit?label=READ'%messages[message]['msg_id']}}">UNREAD</a>
+                {% else %}
+                     <a href="{{ 'http://localhost:5000/message/%s/edit?label=UNREAD'%messages[message]['msg_id']}}">READ</a>
+                {% endif %}
+            </td>
+        </tr>
+        {% else %}
+        <tr><em>You have no messages </em></tr>
+        {% endfor %}
+
+    </table>
+    {% endblock %}
+    </body>
+</html>
