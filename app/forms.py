@@ -8,6 +8,7 @@ class MessageForm(Form):
 
 
 class DraftForm(Form):
-    draft_to = TextField('To: ', validators=[validators.Length(max=100)])
-    draft_subject = TextField('Subject: ', validators=[validators.Length(max=1000)])
-    draft_body = TextAreaField('Message: ', validators=[validators.Length(max=10000)])
+    urn_to = TextField('To: ', validators=[validators.Length(max=100)])
+    subject = TextField('Subject: ', validators=[validators.Length(max=1000)])
+    body = TextAreaField('Message: ', validators=[validators.Length(max=10000)])
+

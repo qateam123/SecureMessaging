@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <title>Draft</title>
+    </head>
+    <body>
+        <form action="{{ 'http://localhost:5000/draft/%s/modify'%draft['msg_id'] }}">
+            <input type="submit" value="Edit">
+        </form>
+            <ul class="draft">
+                <li> Message ID: {{ draft['msg_id'] }}</li>
+                <li> To: {{ draft['urn_to'] }}</li>
+                <li> From: {{ draft['urn_from'] }}</li>
+                <li> Subject: {{ draft['subject'] }}</li>
+                <li> Body: {{ draft['body'] }}</li>
+                <li> Thread ID: {{ draft['thread_id'] }}</li>
+                <li> Collection Case: {{ draft['collection_case'] }}</li>
+                <li> Reporting Unit: {{ draft['reporting_unit'] }}</li>
+                <li> Survey: {{ draft['survey']}}</li>
+            </ul>
+        <form action="http://localhost:5000/messages">
+            <input type="submit" value="Back to Messages">
+        </form>
+    </body>
+</html>

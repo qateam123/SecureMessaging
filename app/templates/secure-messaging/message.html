@@ -19,5 +19,10 @@
     <form action="http://localhost:5000/messages">
         <input type="submit" value="Back to Messages">
     </form>
+        {% if 'INBOX' in message['labels'] %}
+            <form action="{{ '/new-message/%s'%message['thread_id'] }}">
+                <input type="submit" value="Reply">
+            </form>
+        {% endif %}
     </body>
 </html>

@@ -23,14 +23,15 @@
         {% from "secure-messaging/_formhelpers.html" import render_field %}
 
         <div style="padding-left:300px">
+            {{ thread_id }}
             <form method=post>
                 <dl>
                     {{ render_field(form.to_input) }}
                     {{ render_field(form.subject_input) }}
                     {{ render_field(form.message_input) }}
                 </dl>
-                <input type="submit" name="action" value="Send Message"/>
-                <input type="submit" name="action" value="Save as Draft"/>
+                <input type="submit" name="submit" value="Send Message"/>
+                <input type="submit" name="submit" value="Save as Draft"/>
             </form>
         </div>
     </body>

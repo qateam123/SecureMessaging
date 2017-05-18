@@ -4,7 +4,7 @@ from flask import render_template, jsonify
 import requests
 from app import settings
 import sys
-from app.forms import MessageForm
+from app.forms import MessageForm, DraftForm
 from app.authentication.jwt import encode
 from app.authentication.jwe import Encrypter
 import logging
@@ -44,17 +44,18 @@ def index():
     return "Hello, World!"
 
 
-@app.route('/new-message', methods=['GET', 'POST'])
-def dev_mode():
+@app.route('/new-message/<thread_id>', methods=['GET', 'POST'])
+@app.route('/new-message', methods=['GET', 'POST'], defaults={'thread_id': ''})
+def dev_mode(thread_id):
     form = MessageForm(request.form)
 
     if request.method == 'POST' and form.validate():
 
         url = settings.SECURE_MESSAGING_API_URL
         if request.form['submit'] == 'Send Message':
-            return send_message(request.form, url)
+            return send_message(request.form, url, thread_id)
         elif request.form['submit'] == 'Save as Draft':
-            return save_draft(request.form, url)
+            return save_draft(request.form, url, thread_id)
 
     return render_template('secure-messaging/new-message.html', form=form)
 
@@ -93,6 +94,33 @@ def edit_msg(message_id):
     return redirect("http://localhost:5000/" + settings.SM_GET_MESSAGES_URL)
 
 
+@app.route('/draft/<draft_id>', methods=['GET'])
+def get_draft(draft_id):
+    url = settings.SECURE_MESSAGING_API_URL + settings.SM_GET_DRAFT_URL.format(draft_id)
+    resp = requests.get(url, headers=headers)
+    response = json.loads(resp.text)
+    return render_template("secure-messaging/draft.html", draft=response)
+
+
+@app.route('/draft/<draft_id>/modify', methods=['GET', 'POST'])
+def edit_draft(draft_id):
+    resp = requests.get(settings.SECURE_MESSAGING_API_URL + settings.SM_GET_DRAFT_URL.format(draft_id), headers=headers)
+    resp_data = json.loads(resp.text)
+    form = DraftForm(request.form)
+    form.urn_to.data = resp_data['urn_to']
+    form.subject.data = resp_data['subject']
+    form.body.data = resp_data['body']
+
+    if request.method == 'POST':
+        url = settings.SECURE_MESSAGING_API_URL
+        if request.form['submit'] == 'Send Message':
+            return send_message(request.form, url, resp_data['thread_id'])
+        elif request.form['submit'] == 'Save as Draft':
+            return modify_draft(request.form, url, resp_data['thread_id'])
+
+    return render_template('secure-messaging/draft-edit.html', form=form)
+
+
 @app.route('/validate', methods=['GET'])
 def validate():
     message = request.args.get('msg')
@@ -102,19 +130,28 @@ def validate():
         return jsonify(msgValid=True, msg=message)
 
 
-def send_message(form, url):
+def send_message(form, url, thread_id=None):
     data = {'urn_to': form['to_input'], 'urn_from': token_data['user_urn'], 'subject': form['subject_input'],
-            'body': form['message_input'], 'thread_id': '', 'collection_case': 'testCC', 'reporting_unit': 'testRU', 'survey': 'testSurvey'}
+            'body': form['message_input'], 'thread_id': thread_id, 'collection_case': 'testCC', 'reporting_unit': 'testRU', 'survey': 'testSurvey'}
     response = requests.post(url+settings.SM_SEND_MESSAGE_URL, data=json.dumps(data), headers=headers)
     resp_data = json.loads(response.text)
     logger.info(response.status_code, resp_data['msg_id'])
     return render_template("secure-messaging/sent-message.html", code=201)
 
 
-def save_draft(form, url):
+def save_draft(form, url, thread_id):
     data = {'urn_to': form['to_input'], 'urn_from': token_data['user_urn'], 'subject': form['subject_input'],
-            'body': form['message_input'], 'thread_id': '', 'collection_case': 'testCC', 'reporting_unit': 'testRU', 'survey': 'testSurvey'}
+            'body': form['message_input'], 'thread_id': thread_id, 'collection_case': 'testCC', 'reporting_unit': 'testRU', 'survey': 'testSurvey'}
     response = requests.post(url + settings.SM_SAVE_DRAFT_URL, data=json.dumps(data), headers=headers)
     resp_data = json.loads(response.text)
     logger.info(response.status_code, resp_data['msg_id'])
+    return render_template("secure-messaging/save-draft.html", code=201)
+
+
+def modify_draft(form, url, thread_id):
+    modify_draft_data = {'urn_to': form['urn_to'], 'urn_from': token_data['user_urn'], 'subject': form['subject'],
+                         'body': form['body'], 'thread_id': thread_id, 'collection_case': 'testCC', 'reporting_unit': 'testRU', 'survey': 'testSurvey'}
+    response = requests.post(url + settings.SM_SAVE_DRAFT_URL, data=json.dumps(modify_draft_data), headers=headers)
+    resp_data = json.loads(response.text)
+    logger.info("1")
     return render_template("secure-messaging/save-draft.html", code=201)

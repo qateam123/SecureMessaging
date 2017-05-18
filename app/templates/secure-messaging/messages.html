@@ -29,7 +29,12 @@
                 INBOX
                 {% endif %}
             </td>
-            <td><a href="{{ 'http://localhost:5000/message/%s'%messages[message]['msg_id']}}">{{ messages[message]['msg_id'] }}</a></td>
+            <td>{% if 'DRAFT' in messages[message]['labels'] %}
+                <a href="{{ 'http://localhost:5000/draft/%s'%messages[message]['msg_id']}}">{{ messages[message]['msg_id'] }}</a>
+                {% else %}
+                <a href="{{ 'http://localhost:5000/message/%s'%messages[message]['msg_id']}}">{{ messages[message]['msg_id'] }}</a>
+                {% endif %}
+            </td>
             <td>{% for to in messages[message]['urn_to'] %}
                  {{ to }}
                  {% endfor %}</td>
