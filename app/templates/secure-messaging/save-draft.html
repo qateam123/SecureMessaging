@@ -5,8 +5,10 @@
         <title>Successful Draft</title>
     </head>
     <body>
-        <div id="main">
+    {% extends "secure-messaging/layout.html" %}
+    {% block body %}
+    User: {{ user_urn }}
           <h1>Your Draft has been successfully saved!</h1>
-        </div>
+    {% endblock %}
     </body>
 </html>

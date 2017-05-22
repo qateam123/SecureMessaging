@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Navigation</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='nav.css') }}">
+</head>
+    <body>
+        <div id="nav">
+        <ul>
+            <li><a href="http://localhost:5000/new-message">New Message</a></li>
+            <li><a href="http://localhost:5000/messages">All Messages</a></li>
+            <li><a href="http://localhost:5000/messages/INBOX">Inbox</a></li>
+            <li><a href="http://localhost:5000/messages/SENT">Sent</a></li>
+            <li><a href="http://localhost:5000/messages/DRAFT">Drafts</a></li>
+        </ul>
+    </div>
+    </body>
+    {% block body %}
+    {% endblock %}
+</body>
+</html>

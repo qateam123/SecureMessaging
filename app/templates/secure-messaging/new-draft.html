@@ -5,8 +5,11 @@
         <title>New Draft</title>
     </head>
     <body>
+    {% extends "secure-messaging/layout.html" %}
+    {% block body %}
         {% from "secure-messaging/_formhelpers.html" import render_field %}
         <div>
+            User: {{ user_urn }}
             <form method=post>
                 <dl>
                     {{ render_field(form.urn_to) }}
@@ -16,5 +19,6 @@
                 <button id=submit>Save</button>
             </form>
         </div>
+    {% endblock %}
     </body>
 </html>

@@ -1,10 +1,14 @@
 <html>
-  <head>
-    <title>Message Sent</title>
-  </head>
-  <body>
-    <div id="main">
-      <h1>Your Message has been Successfully Sent!</h1>
-    </div>
-  </body>
+    <head>
+        <title>Message Sent</title>
+    </head>
+    <body>
+    {% extends "secure-messaging/layout.html" %}
+    {% block body %}
+        <div id="main">
+            User: {{ user_urn }}
+          <h1>Your Message has been Successfully Sent!</h1>
+        </div>
+    {% endblock %}
+    </body>
 </html>

@@ -1,22 +1,26 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Edit Draft</title>
-</head>
-<body>
-    {% from "secure-messaging/_formhelpers.html" import render_field %}
+    <head>
+        <meta charset="UTF-8">
+        <title>Edit Draft</title>
+    </head>
+    <body>
+        {% extends "secure-messaging/layout.html" %}
+        {% block body %}
+            {% from "secure-messaging/_formhelpers.html" import render_field %}
 
-    <div>
-        <form method=post>
-            <dl>
-                {{ render_field(form.urn_to) }}
-                {{ render_field(form.subject) }}
-                {{ render_field(form.body) }}
-            </dl>
-            <input type="submit" name="submit" value="Send Message"/>
-            <input type="submit" name="submit" value="Save as Draft"/>
-        </form>
-    </div>
-</body>
+            <div>
+                User: {{ user_urn }}
+                <form method=post>
+                    <dl>
+                        {{ render_field(form.urn_to) }}
+                        {{ render_field(form.subject) }}
+                        {{ render_field(form.body) }}
+                    </dl>
+                    <input type="submit" name="submit" value="Send Message"/>
+                    <input type="submit" name="submit" value="Save as Draft"/>
+                </form>
+            </div>
+        {% endblock %}
+    </body>
 </html>

@@ -1,9 +1,8 @@
 from app import app
-from flask import request, redirect, json
+from flask import request, redirect, json, g, url_for
 from flask import render_template, jsonify
 import requests
 from app import settings
-import sys
 from app.forms import MessageForm, DraftForm
 from app.authentication.jwt import encode
 from app.authentication.jwe import Encrypter
@@ -11,20 +10,32 @@ import logging
 
 logger = logging.getLogger(__name__)
 token_data = {
-            "user_urn": "respondent.12345678910"
+            "user_urn": "0000"
         }
-encrypter = Encrypter(_private_key=settings.SM_USER_AUTHENTICATION_PRIVATE_KEY,
-                      _private_key_password=settings.SM_USER_AUTHENTICATION_PRIVATE_KEY_PASSWORD,
-                      _public_key=settings.SM_USER_AUTHENTICATION_PUBLIC_KEY)
-signed_jwt = encode(token_data)
-encrypted_jwt = encrypter.encrypt_token(signed_jwt)
-headers = {'Content-Type': 'application/json', 'authentication': encrypted_jwt}
+
+headers = {'Content-Type': 'application/json', 'Authorization': ''}
+
+
+def update_encrypted_jwt():
+    encrypter = Encrypter(_private_key=settings.SM_USER_AUTHENTICATION_PRIVATE_KEY,
+                          _private_key_password=settings.SM_USER_AUTHENTICATION_PRIVATE_KEY_PASSWORD,
+                          _public_key=settings.SM_USER_AUTHENTICATION_PUBLIC_KEY)
+    signed_jwt = encode(token_data)
+    return encrypter.encrypt_token(signed_jwt)
+
+headers['Authorization'] = update_encrypted_jwt()
 
 modify_data = {'action': '',
                'label': ''}
 
 
+def check_login():
+    if token_data['user_urn'] == "0000":
+        return redirect(url_for('login'))
+
+
 def add_messages():
+    headers['Authorization'] = update_encrypted_jwt()
     sample_data = {'urn_to': token_data['user_urn'],
                    'urn_from': 'internal.789',
                    'subject': 'Notorious Toddlers',
@@ -32,45 +43,78 @@ def add_messages():
                    'thread_id': '',
                    'collection_case': 'CCtest',
                    'reporting_unit': 'RUtest',
-                   'survey': 'RSI'}
+                   'survey': 'BRES'}
     for x in range(0, 2):
         requests.post(url=settings.SECURE_MESSAGING_API_URL + settings.SM_SEND_MESSAGE_URL, data=json.dumps(sample_data), headers=headers)
 
 
-@app.route('/')
 @app.route('/index')
 def index():
     add_messages()
     return "Hello, World!"
 
 
+@app.route('/', methods=['GET', 'POST'])
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+    if request.method == 'POST':
+        token_data['user_urn'] = request.form['submit']
+        headers['Authorization'] = update_encrypted_jwt()
+        return redirect("http://localhost:5000/messages")
+    return render_template("/secure-messaging/login.html")
+
+
 @app.route('/new-message/<thread_id>', methods=['GET', 'POST'])
 @app.route('/new-message', methods=['GET', 'POST'], defaults={'thread_id': ''})
 def dev_mode(thread_id):
+    check_login()
     form = MessageForm(request.form)
-
+    headers['Authorization'] = update_encrypted_jwt()
     if request.method == 'POST' and form.validate():
-
         url = settings.SECURE_MESSAGING_API_URL
         if request.form['submit'] == 'Send Message':
             return send_message(request.form, url, thread_id)
         elif request.form['submit'] == 'Save as Draft':
             return save_draft(request.form, url, thread_id)
 
-    return render_template('secure-messaging/new-message.html', form=form)
+    return render_template('secure-messaging/new-message.html', form=form, user_urn=token_data['user_urn'])
 
 
-@app.route('/messages', methods=['GET'])
-def get_msgs():
-    url = settings.SECURE_MESSAGING_API_URL + settings.SM_GET_MESSAGES_URL
-    resp = requests.get(url, headers=headers)
-    resp_data = json.loads(resp.text)
-    return render_template("secure-messaging/messages.html", messages=resp_data['messages'])
+@app.route('/messages/<label>', methods=['GET', 'POST'])
+@app.route('/messages', methods=['GET', 'POST'])
+def get_msgs(label=None):
+    check_login()
+    if request.method == 'GET':
+        url = settings.SECURE_MESSAGING_API_URL + settings.SM_GET_MESSAGES_URL
+        headers['Authorization'] = update_encrypted_jwt()
+        if label is not None:
+            url = url + "?label=" + label
+        if 'internal' in token_data['user_urn']:
+            if label is not None:
+                url = url + "&survey=BRES"
+            else:
+                url = url + "?survey=BRES"
+        resp = requests.get(url, headers=headers)
+        resp_data = json.loads(resp.text)
+        links = resp_data['_links']
+    else:
+        headers['Authorization'] = update_encrypted_jwt()
+        url = request.form['submit']
+        if label is not None:
+            url = url + "&label=" + label
+        if 'internal' in token_data['user_urn']:
+            url = url + "&survey=BRES"
+        resp = requests.get(url, headers=headers)
+        resp_data = json.loads(resp.text)
+        links = resp_data['_links']
+    return render_template("secure-messaging/messages.html", messages=resp_data['messages'], links=links)
 
 
 @app.route('/message/<message_id>', methods=['GET'])
 def get_msg(message_id):
+    check_login()
     url = settings.SECURE_MESSAGING_API_URL + settings.SM_GET_MESSAGE_URL.format(message_id)
+    headers['Authorization'] = update_encrypted_jwt()
     resp = requests.get(url, headers=headers)
     response = json.loads(resp.text)
     if 'UNREAD' in response['labels']:
@@ -82,7 +126,9 @@ def get_msg(message_id):
 
 @app.route('/message/<message_id>/edit', methods=['GET', 'POST'])
 def edit_msg(message_id):
+    check_login()
     label = request.args.get('label')
+    headers['Authorization'] = update_encrypted_jwt()
     url = settings.SECURE_MESSAGING_API_URL + settings.SM_MODIFY_MESSAGE_URL.format(message_id)
     if label == 'READ':
         modify_data['action'] = 'remove'
@@ -96,6 +142,8 @@ def edit_msg(message_id):
 
 @app.route('/draft/<draft_id>', methods=['GET'])
 def get_draft(draft_id):
+    check_login()
+    headers['Authorization'] = update_encrypted_jwt()
     url = settings.SECURE_MESSAGING_API_URL + settings.SM_GET_DRAFT_URL.format(draft_id)
     resp = requests.get(url, headers=headers)
     response = json.loads(resp.text)
@@ -104,6 +152,8 @@ def get_draft(draft_id):
 
 @app.route('/draft/<draft_id>/modify', methods=['GET', 'POST'])
 def edit_draft(draft_id):
+    check_login()
+    headers['Authorization'] = update_encrypted_jwt()
     resp = requests.get(settings.SECURE_MESSAGING_API_URL + settings.SM_GET_DRAFT_URL.format(draft_id), headers=headers)
     resp_data = json.loads(resp.text)
     form = DraftForm(request.form)
@@ -130,9 +180,10 @@ def validate():
         return jsonify(msgValid=True, msg=message)
 
 
-def send_message(form, url, thread_id=None):
+def send_message(form, url, thread_id):
+    headers['Authorization'] = update_encrypted_jwt()
     data = {'urn_to': form['to_input'], 'urn_from': token_data['user_urn'], 'subject': form['subject_input'],
-            'body': form['message_input'], 'thread_id': thread_id, 'collection_case': 'testCC', 'reporting_unit': 'testRU', 'survey': 'testSurvey'}
+            'body': form['message_input'], 'thread_id': thread_id, 'collection_case': 'testCC', 'reporting_unit': 'testRU', 'survey': 'BRES'}
     response = requests.post(url+settings.SM_SEND_MESSAGE_URL, data=json.dumps(data), headers=headers)
     resp_data = json.loads(response.text)
     logger.info(response.status_code, resp_data['msg_id'])
@@ -140,8 +191,9 @@ def send_message(form, url, thread_id=None):
 
 
 def save_draft(form, url, thread_id):
+    headers['Authorization'] = update_encrypted_jwt()
     data = {'urn_to': form['to_input'], 'urn_from': token_data['user_urn'], 'subject': form['subject_input'],
-            'body': form['message_input'], 'thread_id': thread_id, 'collection_case': 'testCC', 'reporting_unit': 'testRU', 'survey': 'testSurvey'}
+            'body': form['message_input'], 'thread_id': thread_id, 'collection_case': 'testCC', 'reporting_unit': 'testRU', 'survey': 'BRES'}
     response = requests.post(url + settings.SM_SAVE_DRAFT_URL, data=json.dumps(data), headers=headers)
     resp_data = json.loads(response.text)
     logger.info(response.status_code, resp_data['msg_id'])
@@ -149,9 +201,10 @@ def save_draft(form, url, thread_id):
 
 
 def modify_draft(form, url, thread_id):
+    headers['Authorization'] = update_encrypted_jwt()
     modify_draft_data = {'urn_to': form['urn_to'], 'urn_from': token_data['user_urn'], 'subject': form['subject'],
-                         'body': form['body'], 'thread_id': thread_id, 'collection_case': 'testCC', 'reporting_unit': 'testRU', 'survey': 'testSurvey'}
-    response = requests.post(url + settings.SM_SAVE_DRAFT_URL, data=json.dumps(modify_draft_data), headers=headers)
+                         'body': form['body'], 'thread_id': thread_id, 'collection_case': 'testCC', 'reporting_unit': 'testRU', 'survey': 'BRES'}
+    response = requests.put(url + settings.SM_SAVE_DRAFT_URL, data=json.dumps(modify_draft_data), headers=headers)
     resp_data = json.loads(response.text)
     logger.info("1")
     return render_template("secure-messaging/save-draft.html", code=201)

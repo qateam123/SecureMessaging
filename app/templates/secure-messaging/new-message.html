@@ -8,10 +8,13 @@
     </head>
 
     <body>
+    {% extends "secure-messaging/layout.html" %}
+    {% block body %}
         </br>
         </br>
         {% with messages = get_flashed_messages(with_categories=true) %}
         {% if messages %}
+
         <ul>
             {% for message in messages %}
             <li>{{ message[1] }}</li>
@@ -23,7 +26,7 @@
         {% from "secure-messaging/_formhelpers.html" import render_field %}
 
         <div style="padding-left:300px">
-            {{ thread_id }}
+            User: {{ user_urn }}
             <form method=post>
                 <dl>
                     {{ render_field(form.to_input) }}
@@ -34,5 +37,6 @@
                 <input type="submit" name="submit" value="Save as Draft"/>
             </form>
         </div>
+    {% endblock %}
     </body>
 </html>

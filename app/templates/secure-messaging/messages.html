@@ -5,11 +5,14 @@
         <title>All Messages</title>
     </head>
     <body>
+    {% extends "secure-messaging/layout.html" %}
     {% block body %}
+    User: {{ user_urn }}
         <h1>List of Messages</h1>
 
     <table style="width:100%; text-align: center;">
         <tr>
+            <th>id</th>
             <th>Mailbox</th>
             <th>Message ID</th>
             <th>To</th>
@@ -19,8 +22,9 @@
             <th>Date</th>
             <th>Read Status</th>
         </tr>
-        {% for message in messages %}
+        {% for message in messages|sort %}
         <tr>
+            <td>{{ message }}</td>
             <td>{% if 'DRAFT' in messages[message]['labels'] %}
                 DRAFT
                 {% elif 'SENT' in messages[message]['labels'] %}
@@ -54,8 +58,17 @@
         {% else %}
         <tr><em>You have no messages </em></tr>
         {% endfor %}
-
     </table>
+    {% if links['prev'] is defined %}
+        <form action="/messages" method="post">
+            <button name="submit" type="submit" value="{{ links['prev']['href'] }}">Previously</button>
+        </form>
+    {% endif %}
+    {% if links['next'] is defined %}
+        <form action="/messages" method="post">
+            <button name="submit" type="submit" value="{{ links['next']['href'] }}">Next</button>
+        </form>
+    {% endif %}
     {% endblock %}
     </body>
 </html>

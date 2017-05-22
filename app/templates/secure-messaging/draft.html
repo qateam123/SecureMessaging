@@ -5,6 +5,9 @@
         <title>Draft</title>
     </head>
     <body>
+    {% extends "secure-messaging/layout.html" %}
+    {% block body %}
+    User: {{ user_urn }}
         <form action="{{ 'http://localhost:5000/draft/%s/modify'%draft['msg_id'] }}">
             <input type="submit" value="Edit">
         </form>
@@ -22,5 +25,6 @@
         <form action="http://localhost:5000/messages">
             <input type="submit" value="Back to Messages">
         </form>
+    {% endblock %}
     </body>
 </html>

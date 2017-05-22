@@ -5,6 +5,9 @@
         <title>Show Message</title>
     </head>
     <body>
+    {% extends "secure-messaging/layout.html" %}
+    {% block body %}
+    User: {{ user_urn }}
         <ul class="message">
             <li> Message ID: {{ message['msg_id'] }}</li>
             <li> To: {{ message['urn_to'] }}</li>
@@ -24,5 +27,6 @@
                 <input type="submit" value="Reply">
             </form>
         {% endif %}
+    {% endblock %}
     </body>
 </html>
