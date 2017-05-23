@@ -1,6 +1,7 @@
 # secure-messaging-ui
 [![Build Status](https://travis-ci.org/qateam123/secure-messaging-ui.svg?branch=master)](https://travis-ci.org/qateam123/secure-messaging-ui)
 
+
 ## Run with Docker
 
 To get secure-messaging-ui running the following command will build and run the containers
@@ -21,7 +22,7 @@ If you need to rebuild the container from scratch to re-load any dependencies th
 docker-compose build --no-cache
 ```
 
-## Setup
+## Setup and Run
 Based on python 3
 
 Create a new virtual env for python3
@@ -34,6 +35,12 @@ Install dependencies using pip
 
 ```
 pip install -r requirements.txt
+```
+
+Run
+
+```
+python run.py
 ```
 
 ## Test
