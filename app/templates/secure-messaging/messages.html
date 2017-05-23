@@ -20,6 +20,7 @@
             <th>Subject</th>
             <th>Body</th>
             <th>Date</th>
+            <th>Thread ID</th>
             <th>Read Status</th>
         </tr>
         {% for message in messages|sort %}
@@ -34,9 +35,9 @@
                 {% endif %}
             </td>
             <td>{% if 'DRAFT' in messages[message]['labels'] %}
-                <a href="{{ 'http://localhost:5000/draft/%s'%messages[message]['msg_id']}}">{{ messages[message]['msg_id'] }}</a>
+                <a href="{{ 'http://localhost:5000/draft/%s'%messages[message]['msg_id']}}">{{ messages[message]['msg_id']|truncate(10) }}</a>
                 {% else %}
-                <a href="{{ 'http://localhost:5000/message/%s'%messages[message]['msg_id']}}">{{ messages[message]['msg_id'] }}</a>
+                <a href="{{ 'http://localhost:5000/message/%s'%messages[message]['msg_id']}}">{{ messages[message]['msg_id']|truncate(10) }}</a>
                 {% endif %}
             </td>
             <td>{% for to in messages[message]['urn_to'] %}
@@ -46,6 +47,7 @@
             <td>{{ messages[message]['subject'] }}</td>
             <td>{{ messages[message]['body']|truncate(10) }}</td>
             <td>{{ messages[message]['sent_date'] }}</td>
+            <td>{{ messages[message]['thread_id'] }}</td>
             <td>{% if 'INBOX' in messages[message]['labels'] %}
                     {% if 'UNREAD' in messages[message]['labels'] %}
                          <a href="{{ 'http://localhost:5000/message/%s/edit?label=READ'%messages[message]['msg_id']}}">UNREAD</a>
