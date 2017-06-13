@@ -12,7 +12,6 @@
 
     <table style="width:100%; text-align: center;">
         <tr>
-            <th>id</th>
             <th>Mailbox</th>
             <th>Message ID</th>
             <th>To</th>
@@ -23,36 +22,41 @@
             <th>Thread ID</th>
             <th>Read Status</th>
         </tr>
-        {% for message in messages|sort %}
+        {% for message in messages %}
         <tr>
-            <td>{{ message }}</td>
-            <td>{% if 'DRAFT' in messages[message]['labels'] %}
+            <td>{% if 'DRAFT' in message['labels'] %}
                 DRAFT
-                {% elif 'SENT' in messages[message]['labels'] %}
+                {% elif 'SENT' in message['labels'] %}
                 SENT
-                {% elif 'INBOX' in messages[message]['labels'] %}
+                {% elif 'INBOX' in message['labels'] %}
                 INBOX
                 {% endif %}
             </td>
-            <td>{% if 'DRAFT' in messages[message]['labels'] %}
-                <a href="{{ 'http://localhost:5000/draft/%s'%messages[message]['msg_id']}}">{{ messages[message]['msg_id']|truncate(10) }}</a>
+            <td>{% if 'DRAFT' in message['labels'] %}
+                <a href="{{ 'http://localhost:5000/draft/%s'%message['msg_id']}}">{{ message['msg_id']|truncate(10) }}</a>
                 {% else %}
-                <a href="{{ 'http://localhost:5000/message/%s'%messages[message]['msg_id']}}">{{ messages[message]['msg_id']|truncate(10) }}</a>
+                <a href="{{ 'http://localhost:5000/message/%s'%message['msg_id']}}">{{ message['msg_id']|truncate(10) }}</a>
                 {% endif %}
             </td>
-            <td>{% for to in messages[message]['urn_to'] %}
+            <td>{% for to in message['urn_to'] %}
                  {{ to }}
                  {% endfor %}</td>
-            <td>{{ messages[message]['urn_from'] }}</td>
-            <td>{{ messages[message]['subject'] }}</td>
-            <td>{{ messages[message]['body']|truncate(10) }}</td>
-            <td>{{ messages[message]['sent_date'] }}</td>
-            <td>{{ messages[message]['thread_id'] }}</td>
-            <td>{% if 'INBOX' in messages[message]['labels'] %}
-                    {% if 'UNREAD' in messages[message]['labels'] %}
-                         <a href="{{ 'http://localhost:5000/message/%s/edit?label=READ'%messages[message]['msg_id']}}">UNREAD</a>
+            <td>{{ message['urn_from'] }}</td>
+            <td>{{ message['subject'] }}</td>
+            <td>{{ message['body']|truncate(10) }}</td>
+            <td>{% if 'SENT' in message['labels'] or 'INBOX' in message['labels'] %}
+                    {{ message['sent_date'] }}
+                 {% elif 'DRAFT' in message['labels'] %}
+                    {{ message['modified_date'] }}
+                {% endif %}
+            </td>
+
+            <td>{{ message['thread_id'] }}</td>
+            <td>{% if 'INBOX' in message['labels'] %}
+                    {% if 'UNREAD' in message['labels'] %}
+                         <a href="{{ 'http://localhost:5000/message/%s/edit?label=READ'%message['msg_id']}}">UNREAD</a>
                     {% else %}
-                         <a href="{{ 'http://localhost:5000/message/%s/edit?label=UNREAD'%messages[message]['msg_id']}}">READ</a>
+                         <a href="{{ 'http://localhost:5000/message/%s/edit?label=UNREAD'%message['msg_id']}}">READ</a>
                     {% endif %}
                 {% endif %}
             </td>
